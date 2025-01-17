@@ -1,6 +1,4 @@
-﻿using CsvHelper.Configuration.Attributes;
-
-public struct UrNew
+﻿public struct UrNew
 {
     public DateOnly? DataAtualizacao { get; set; }
 
