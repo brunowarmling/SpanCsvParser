@@ -62,7 +62,7 @@ else
 
 [FluentResults](https://github.com/altmann/FluentResults)
 
-#Benchmarks
+# Benchmarks
 
 Compared against [CsvHelper](https://github.com/JoshClose/CsvHelper) and common csv parser.
 
@@ -74,8 +74,8 @@ The benchmark was ran against files that had:
 	
 ![Benchmark](/images/Benchmark.png)
 
-#Contributions
+# Contributions
 Contributions are welcome! Feel free to open issues or submit pull requests.
 
-#License
+# License
 This project is licensed under the MIT License.
