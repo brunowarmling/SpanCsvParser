@@ -1,9 +1,11 @@
 ﻿using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Jobs;
 using CsvHelper;
 using CsvHelper.Configuration;
 using FluentResults;
 
 [MemoryDiagnoser]
+[SimpleJob(RuntimeMoniker.Net90)]
 public class CsvParserBenchmark
 {
     private const string Folder = "Resources";

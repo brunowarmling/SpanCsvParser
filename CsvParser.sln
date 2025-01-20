@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.11.35327.3
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CsvParser", "CsvParser.csproj", "{7C0F6D7A-466E-46FF-940A-0AF1B7789506}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpanCsvParser", "src\SpanCsvParser\SpanCsvParser.csproj", "{5735465E-F896-4EDE-888C-68FE76D9B75E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpanCsvParser.Benchmarks", "src\SpanCsvParser.Benchmarks\SpanCsvParser.Benchmarks.csproj", "{033BD32B-F939-4271-B3E8-94CBAD4A81FF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,10 +13,14 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{7C0F6D7A-466E-46FF-940A-0AF1B7789506}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7C0F6D7A-466E-46FF-940A-0AF1B7789506}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7C0F6D7A-466E-46FF-940A-0AF1B7789506}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7C0F6D7A-466E-46FF-940A-0AF1B7789506}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5735465E-F896-4EDE-888C-68FE76D9B75E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5735465E-F896-4EDE-888C-68FE76D9B75E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5735465E-F896-4EDE-888C-68FE76D9B75E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5735465E-F896-4EDE-888C-68FE76D9B75E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{033BD32B-F939-4271-B3E8-94CBAD4A81FF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{033BD32B-F939-4271-B3E8-94CBAD4A81FF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{033BD32B-F939-4271-B3E8-94CBAD4A81FF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{033BD32B-F939-4271-B3E8-94CBAD4A81FF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

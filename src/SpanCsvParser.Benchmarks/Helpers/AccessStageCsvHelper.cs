@@ -19,10 +19,9 @@ public static class AccessStageCsvHelper
     /// <param name="objeto">O objeto <see cref="Ur"/> que irá receber o campo.</param>
     public static void PreencherCamposV1(ref ReadOnlySpan<byte> campo, ref int indiceColuna, ref UrNew objeto)
     {
-        var campoAtual = Encoding.UTF8.GetString(campo);
-
         if (indiceColuna == 0)
         {
+            var campoAtual = Encoding.UTF8.GetString(campo);
             if (!DateOnly.TryParse(campoAtual, out DateOnly dataAtualizacaoConvertido))
             {
                 throw new InvalidOperationException($"Não é possível converter {nameof(Ur.DataAtualizacao)}");
@@ -32,19 +31,22 @@ public static class AccessStageCsvHelper
         }
         else if (indiceColuna == 1)
         {
+            var campoAtual = Encoding.UTF8.GetString(campo);
             objeto.TitularUr = campoAtual;
         }
         else if (indiceColuna == 2)
         {
+            var campoAtual = Encoding.UTF8.GetString(campo);
             objeto.Credenciadora = campoAtual;
         }
         else if (indiceColuna == 3)
         {
+            var campoAtual = Encoding.UTF8.GetString(campo);
             objeto.ArranjoPagamento = campoAtual;
         }
         else if (indiceColuna == 4)
         {
-            if (!decimal.TryParse(campoAtual, out decimal vTotalConvertido))
+            if (!decimal.TryParse(campo, out decimal vTotalConvertido))
             {
                 throw new InvalidOperationException($"Não é possível converter {nameof(Ur.ValorTotal)}");
             }
@@ -53,7 +55,7 @@ public static class AccessStageCsvHelper
         }
         else if (indiceColuna == 5)
         {
-            if (!long.TryParse(campoAtual, out long prioridadeConvertido))
+            if (!long.TryParse(campo, out long prioridadeConvertido))
             {
                 throw new InvalidOperationException($"Não é possível converter {nameof(Ur.Prioridade)}");
             }
@@ -62,7 +64,7 @@ public static class AccessStageCsvHelper
         }
         else if (indiceColuna == 6)
         {
-            if (!long.TryParse(campoAtual, out long regraDivisaoConvertido))
+            if (!long.TryParse(campo, out long regraDivisaoConvertido))
             {
                 throw new InvalidOperationException($"Não é possível converter {nameof(Ur.RegraDivisao)}");
             }
@@ -71,7 +73,7 @@ public static class AccessStageCsvHelper
         }
         else if (indiceColuna == 7)
         {
-            if (!decimal.TryParse(campoAtual, out decimal valorSolicitadoConvertido))
+            if (!decimal.TryParse(campo, out decimal valorSolicitadoConvertido))
             {
                 throw new InvalidOperationException($"Não é possível converter {nameof(Ur.ValorSolicitado)}");
             }
@@ -80,7 +82,7 @@ public static class AccessStageCsvHelper
         }
         else if (indiceColuna == 8)
         {
-            if (!decimal.TryParse(campoAtual, out decimal valorConstituidoConvertido))
+            if (!decimal.TryParse(campo, out decimal valorConstituidoConvertido))
             {
                 throw new InvalidOperationException($"Não é possível converter {nameof(Ur.ValorConstituido)}");
             }
@@ -89,6 +91,7 @@ public static class AccessStageCsvHelper
         }
         else if (indiceColuna == 9)
         {
+            var campoAtual = Encoding.UTF8.GetString(campo);
             if (!DateOnly.TryParse(campoAtual, out DateOnly dataLiquidacaoConvertido))
             {
                 throw new InvalidOperationException($"Não é possível converter {nameof(Ur.DataLiquidacao)}");
