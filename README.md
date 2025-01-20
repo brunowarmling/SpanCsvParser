@@ -53,6 +53,7 @@ else
     Console.WriteLine($"Error: {result.Errors[0].Message}");
 }
 
+```
 
 # Requirements
 .NET 9 or higher
