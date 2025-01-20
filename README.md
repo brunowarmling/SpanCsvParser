@@ -67,10 +67,11 @@ else
 Compared against [CsvHelper](https://github.com/JoshClose/CsvHelper) and common csv parser.
 
 The benchmark was ran against files that had:
-	- 1 line
-	- 50 lines
-	- 500 lines
-	- 5000 lines
+
+- 1 line
+- 50 lines
+- 500 lines
+- 5000 lines
 	
 ![Benchmark](/images/Benchmark.png)
 
