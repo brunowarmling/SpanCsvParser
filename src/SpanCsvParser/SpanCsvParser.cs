@@ -1,13 +1,13 @@
-﻿using FluentResults;
-using System.Buffers;
+﻿using System.Buffers;
 using System.IO.Pipelines;
+using System.Runtime.CompilerServices;
 
 /// <summary>
 /// Representa o serviço de parser de CSV.
 /// </summary>
 /// <typeparam name="TObjeto">Representa o tipo do objeto a ser feito parse.</typeparam>
 public static class SpanCsvParser<TObjeto>
-    where TObjeto : struct
+       where TObjeto : struct
 {
     /// <summary>
     /// Callback para preencher o objeto com os valores da leitura do csv.
@@ -29,24 +29,45 @@ public static class SpanCsvParser<TObjeto>
     /// <param name="numeroColunas">Indica o número de colunas que há no CSV.</param>
     /// <param name="cancellationToken">Representa o token de cancelamento.</param>
     /// <returns>Um <see cref="ValueTask"/> que representa a operação assincrona.</returns>
-    public static async ValueTask<Result<(TObjeto[], int)>> ParseAsync(Stream arquivo, ReadCallback callback, int numeroColunas, CancellationToken cancellationToken)
+    public static async ValueTask<TObjeto[]> ParseAsync(Stream arquivo, ReadCallback callback, int numeroColunas, CancellationToken cancellationToken)
     {
-        var urs = ArrayPool<TObjeto>.Shared.Rent(10000);
+        var urs = ArrayPool<TObjeto>.Shared.Rent(GetRentLength(arquivo.Length));
         try
         {
             var arrLength = await ParseStream(arquivo, urs, callback, numeroColunas, cancellationToken);
-            return Result.Ok((urs[..arrLength], arrLength));
-        }
-        catch (Exception ex)
-        {
-            return Result.Fail(ex.Message);
+            return urs[..arrLength];
         }
         finally
         {
-            ArrayPool<TObjeto>.Shared.Return(urs);
+            ArrayPool<TObjeto>.Shared.Return(urs, true);
         }
     }
 
+    private static int GetRentLength(long length)
+    {
+        if (length <= 1_000)
+        {
+            return 10;
+        }
+        else if (length <= 10_000)
+        {
+            return 100;
+        }
+        else if (length <= 100_000)
+        {
+            return 1000;
+        }
+        else if (length <= 500_000)
+        {
+            return 5000;
+        }
+        else
+        {
+            return 10000;
+        }
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
     private static async ValueTask<int> ParseStream(Stream arquivo, TObjeto[] items, ReadCallback callback, int numeroColunas, CancellationToken cancellationToken)
     {
         var position = 0;
@@ -63,16 +84,17 @@ public static class SpanCsvParser<TObjeto>
 
             if (result.IsCompleted)
             {
-                sequencePosition = ParseLastLine(ref items, ref callback, ref numeroColunas, ref buffer, ref position);
+                ParseLastLine(ref items, ref callback, ref numeroColunas, ref buffer, ref position);
                 break;
             }
         }
 
-        await pipeReader.CompleteAsync();
+        pipeReader.Complete();
         return position;
     }
 
-    private static SequencePosition ParseLastLine(ref TObjeto[] itemsArray, ref ReadCallback callback, ref int numeroColunas, ref ReadOnlySequence<byte> buffer, ref int position)
+    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+    private static void ParseLastLine(ref TObjeto[] itemsArray, ref ReadCallback callback, ref int numeroColunas, ref ReadOnlySequence<byte> buffer, ref int position)
     {
         var reader = new SequenceReader<byte>(buffer);
         var unreadSpan = reader.UnreadSpan;
@@ -80,10 +102,9 @@ public static class SpanCsvParser<TObjeto>
         {
             itemsArray[position++] = ParseLine(ref unreadSpan, ref callback, ref numeroColunas);
         }
-
-        return reader.Position;
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
     private static SequencePosition ParseLines(ref TObjeto[] itemsArray, ref ReadCallback callback, ref int numeroColunas, ref ReadOnlySequence<byte> buffer, ref int position, ref int currentLine)
     {
         var reader = new SequenceReader<byte>(buffer);
@@ -112,6 +133,7 @@ public static class SpanCsvParser<TObjeto>
         return reader.Position;
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static TObjeto ParseLine(ref ReadOnlySpan<byte> line, ref ReadCallback callback, ref int numeroColunas)
     {
         var commaCount = 0;

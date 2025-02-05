@@ -40,15 +40,12 @@ SpanCsvParser<CsvRow>.ReadCallback callback = (ref ReadOnlySpan<byte> field, ref
     }
 };
 
-using var stream = File.OpenRead("file.csv");
-var result = await SpanCsvParser<CsvRow>.ParseAsync(stream, callback, numberOfColumns: 2, CancellationToken.None);
-
-if (result.IsSuccess)
+try 
 {
-    var (rows, total) = result.Value;
-    Console.WriteLine($"Processed {total} rows.");
+	using var stream = File.OpenRead("file.csv");
+	var result = await SpanCsvParser<CsvRow>.ParseAsync(stream, callback, numberOfColumns: 2, CancellationToken.None);
 }
-else
+catch(Exception ex)
 {
     Console.WriteLine($"Error: {result.Errors[0].Message}");
 }
@@ -57,10 +54,6 @@ else
 
 # Requirements
 .NET 9 or higher
-
-# Dependencies:
-
-[FluentResults](https://github.com/altmann/FluentResults)
 
 # Benchmarks
 
