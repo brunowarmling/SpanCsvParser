@@ -51,8 +51,7 @@ public static class SpanCsvParser<TObjeto>
         try
         {
             var arrLength = await ParseStream(arquivo, arrRetorno, callback, numeroColunas, cancellationToken);
-            var result = new TObjeto[arrLength];
-            return result[..arrLength];
+            return arrRetorno[..arrLength];
         }
         finally
         {
