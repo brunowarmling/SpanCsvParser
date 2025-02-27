@@ -2,12 +2,11 @@
 using System.IO.Pipelines;
 using System.Runtime.CompilerServices;
 
-/// <summary>
 /// Representa o serviço de parser de CSV.
 /// </summary>
 /// <typeparam name="TObjeto">Representa o tipo do objeto a ser feito parse.</typeparam>
 public static class SpanCsvParser<TObjeto>
-       where TObjeto : struct
+   where TObjeto : struct
 {
     /// <summary>
     /// Callback para preencher o objeto com os valores da leitura do csv.
@@ -17,9 +16,26 @@ public static class SpanCsvParser<TObjeto>
     /// <param name="estado">Objeto com estado da linha atual.</param>
     public delegate void ReadCallback(ref ReadOnlySpan<byte> campo, ref int indiceColuna, ref TObjeto estado);
 
+    public delegate ref TObjeto[] GetArrayCallBack();
+
     private static ReadOnlySpan<byte> Delimitador => ";"u8;
 
     private static ReadOnlySpan<byte> QuebraLinha => "\r\n"u8;
+
+    /// <summary>
+    /// Realiza o parse de um arquivo CSV para um array do tipo fornecido.
+    /// </summary>
+    /// <param name="getArrayCallBack">Método que irá retornar a referencia para o array.</param>
+    /// <param name="arquivo">Arquivo csv a ser processado.</param>
+    /// <param name="callback">Método que irá popular os campos no objeto.</param>
+    /// <param name="numeroColunas">Indica o número de colunas que há no CSV.</param>
+    /// <param name="cancellationToken">Representa o token de cancelamento.</param>
+    /// <returns>Um <see cref="ValueTask"/> que representa a operação assincrona.</returns>
+    public static async ValueTask<int> ParseAsync(GetArrayCallBack getArrayCallBack, Stream arquivo, ReadCallback callback, int numeroColunas, CancellationToken cancellationToken)
+    {
+        var arrRetorno = getArrayCallBack();
+        return await ParseStream(arquivo, arrRetorno, callback, numeroColunas, cancellationToken);
+    }
 
     /// <summary>
     /// Realiza o parse de um arquivo CSV para um array do tipo fornecido.
@@ -31,19 +47,20 @@ public static class SpanCsvParser<TObjeto>
     /// <returns>Um <see cref="ValueTask"/> que representa a operação assincrona.</returns>
     public static async ValueTask<TObjeto[]> ParseAsync(Stream arquivo, ReadCallback callback, int numeroColunas, CancellationToken cancellationToken)
     {
-        var urs = ArrayPool<TObjeto>.Shared.Rent(GetRentLength(arquivo.Length));
+        var arrRetorno = ArrayPool<TObjeto>.Shared.Rent(GetRentLength(arquivo.Length));
         try
         {
-            var arrLength = await ParseStream(arquivo, urs, callback, numeroColunas, cancellationToken);
-            return urs[..arrLength];
+            var arrLength = await ParseStream(arquivo, arrRetorno, callback, numeroColunas, cancellationToken);
+            var result = new TObjeto[arrLength];
+            return result[..arrLength];
         }
         finally
         {
-            ArrayPool<TObjeto>.Shared.Return(urs, true);
+            ArrayPool<TObjeto>.Shared.Return(arrRetorno, true);
         }
     }
 
-    private static int GetRentLength(long length)
+    public static int GetRentLength(long length)
     {
         if (length <= 1_000)
         {
@@ -63,7 +80,7 @@ public static class SpanCsvParser<TObjeto>
         }
         else
         {
-            return 10000;
+            return (int)length / 100;
         }
     }
 
@@ -141,10 +158,18 @@ public static class SpanCsvParser<TObjeto>
         while (commaCount <= numeroColunas)
         {
             var tabAt = line.IndexOf(Delimitador);
+            if (commaCount == 0 && tabAt < 0 && numeroColunas > 1)
+            {
+                throw new InvalidOperationException("Arquivo não é um CSV válido.");
+            }
+
             var newLineAt = line.IndexOf(QuebraLinha);
 
             var field = tabAt == -1 && newLineAt == -1 ? line[..^0] : commaCount == numeroColunas ? line[..newLineAt] : line[..tabAt];
-            callback(ref field, ref commaCount, ref ur);
+            if (field.Length > 0)
+            {
+                callback(ref field, ref commaCount, ref ur);
+            }
 
             line = line[(tabAt + 1)..];
             commaCount++;
